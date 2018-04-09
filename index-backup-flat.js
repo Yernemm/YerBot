@@ -1,3 +1,4 @@
+//THIS IS A BACKUP OF AN OLD VERSION OF THE BOT. DO NOT ACTAULLY USE THIS. IT'S BAD.
 const Discord = require("discord.js");
 var fs = require('fs');
 var readline = require('readline');
