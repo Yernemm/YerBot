@@ -11,4 +11,6 @@ For setup, you need a file called "config.json" in the root directory, containin
   "logChannelID": "",
   "lfmApiKey": "",
   "lfmSecret": ""
-}```
+}
+```
+It makes the thing do the do (∩ ͡° ͜ʖ ͡°)⊃━☆ﾟ. *
