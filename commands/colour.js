@@ -14,11 +14,11 @@ exports.run = (config, client, message, argsArr, argsTxt, extraData) => {
     //--------------------------------------------------------------------
 
     //COMMAND LOGIC HERE:
-    
+
     var Color = require('color');
     //debug thing
     //message.channel.send(argsArr);
-    
+
     switch (argsArr[0]) {
         case "hex":
             if (isHex(argsArr[1]) && argsArr[1].length <= 6) {
@@ -31,7 +31,7 @@ exports.run = (config, client, message, argsArr, argsTxt, extraData) => {
             break;
         case "rgb":
             if (validateRGB(argsArr, message)) {
-                var col = Color.rgb(parseInt(argsArr[1], 10),parseInt(argsArr[2], 10),parseInt(argsArr[3], 10));
+                var col = Color.rgb(parseInt(argsArr[1], 10), parseInt(argsArr[2], 10), parseInt(argsArr[3], 10));
                 sendRGBCol(col, config, client, message, argsArr, argsTxt, extraData);
             } else {
                 msg = "Invalid rgb colour."
@@ -62,8 +62,8 @@ exports.cmdtype = () => {
     return cmdtype;
 }
 function isHex(h) {
-    var a = parseInt(h, 16);
-    return (a.toString(16) === h)
+    const m = require("./../shared/methods.js");
+    return (m.lZero(parseInt(h,16).toString(16),6) == h.toString())
 }
 function validateRGB(argsArr, message) {
     //Too lazy for long variable names. Deal with it >.<
@@ -71,34 +71,36 @@ function validateRGB(argsArr, message) {
     for (i = 1; i <= 3; i++) {
         let a = argsArr[i];
         let b = parseInt(argsArr[i], 10);
-        if (a != b){
+        if (a != b) {
             //debug stuff commented out.
-           // message.channel.send(`first ${i}`);
+            // message.channel.send(`first ${i}`);
             f = false;
         }
-        if (b > 255 || b < 0)
-        {
-           // message.channel.send(`second ${i}`);
+        if (b > 255 || b < 0) {
+            // message.channel.send(`second ${i}`);
             f = false;
         }
     }
     return f;
 }
-function sendRGBCol(col, config, client, message, argsArr, argsTxt, extraData){
+function sendRGBCol(col, config, client, message, argsArr, argsTxt, extraData) {
+    const m = require("./../shared/methods.js");
     var textColHex;
-    if(col.isLight())
-    textColHex = "000000";
+    if (col.isLight())
+        textColHex = "000000";
     else
-    textColHex = "ffffff";
+        textColHex = "ffffff";
+
+    var hexNum = m.lZero(col.rgbNumber().toString(16), 6);
 
     const Discord = require("discord.js");
     const embed = new Discord.RichEmbed()
-    .setTitle("__Colour preview__")
-    .addField("RGB", `${col.red()} ${col.green()} ${col.blue()}`)
-    .addField("Hex", col.rgbNumber().toString(16))
-    .setColor(col.rgbNumber())
-    .setThumbnail(`https://dummyimage.com/800x800/${col.rgbNumber().toString(16)}/${textColHex}.png&text=%23${col.rgbNumber().toString(16)}`)
-    .setImage(`https://dummyimage.com/800x200/36393e/${col.rgbNumber().toString(16)}.png&text=${encodeURI(message.member.displayName)}`)
+        .setTitle("__Colour preview__")
+        .addField("RGB", `${col.red()} ${col.green()} ${col.blue()}`)
+        .addField("Hex", hexNum)
+        .setColor(col.rgbNumber())
+        .setThumbnail(`https://dummyimage.com/800x800/${hexNum}/${textColHex}.png&text=%23${hexNum}`)
+        .setImage(`https://dummyimage.com/800x200/36393e/${hexNum}.png&text=${encodeURI(message.member.displayName)}`)
 
-    message.channel.send({embed});
+    message.channel.send({ embed });
 }
