@@ -15,10 +15,10 @@ exports.run = (config, client, message, argsArr, argsTxt, extraData) => {
 
     //COMMAND LOGIC HERE:
     const fs = require('fs');
-    var p1 = m.randArr(fs.readFileSync('./yerFiles/protip/adve1.txt', 'utf8').split('\r\n'));
-    var p2 = m.randArr(fs.readFileSync('./yerFiles/protip/verb1.txt', 'utf8').split('\r\n'));
-    var p3 = m.randArr(fs.readFileSync('./yerFiles/protip/noun1.txt', 'utf8').split('\r\n'));
-    var p4 = m.randArr(fs.readFileSync('./yerFiles/protip/rest1.txt', 'utf8').split('\r\n'));
+    var p1 = m.randArr(fs.readFileSync('./yerFiles/protip/adve1.txt', 'utf8').split(m.nl()));
+    var p2 = m.randArr(fs.readFileSync('./yerFiles/protip/verb1.txt', 'utf8').split(m.nl()));
+    var p3 = m.randArr(fs.readFileSync('./yerFiles/protip/noun1.txt', 'utf8').split(m.nl()));
+    var p4 = m.randArr(fs.readFileSync('./yerFiles/protip/rest1.txt', 'utf8').split(m.nl()));
 
 
     msg += `${p1} ${p2} ${p3}${p4}`;

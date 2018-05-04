@@ -1,4 +1,5 @@
 const Discord = require("discord.js");
+const newLine = require('os').EOL;
 module.exports = {
     log: function (config, bot, message, msg, type ) {
         logging(config, bot, message, msg, type);
@@ -32,7 +33,10 @@ module.exports = {
     },
     randArr: function (array) {
         return array[Math.floor(Math.random() * array.length)];
-    }
+    },
+	nl: function (){
+		return newLine;	
+	}
 
 };
 

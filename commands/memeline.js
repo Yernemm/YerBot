@@ -18,7 +18,7 @@ exports.run = (config, client, message, argsArr, argsTxt, extraData) => {
     //--------------------------------------------------------------------
 
     //COMMAND LOGIC HERE:
-    var lines = fs.readFileSync('./yerFiles/memelines.txt', 'utf8').split('\r\n');
+    var lines = fs.readFileSync('./yerFiles/memelines.txt', 'utf8').split(m.nl());
 
     var heroes = m.getAllHeroes();
 

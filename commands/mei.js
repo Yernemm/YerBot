@@ -16,7 +16,8 @@ exports.run = (config, client, message, args) => {
 
     //COMMAND LOGIC HERE:
     const fs = require('fs');
-    var lines = fs.readFileSync('./yerFiles/meiart.txt', 'utf8').split('\r\n');
+	
+    var lines = fs.readFileSync('./yerFiles/meiart.txt', 'utf8').split(m.nl());
 
     msg = lines[Math.floor(Math.random() * lines.length)];
     message.channel.send(msg);

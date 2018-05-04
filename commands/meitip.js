@@ -16,7 +16,7 @@ exports.run = (config, client, message, args) => {
 
     //COMMAND LOGIC HERE:
     const fs = require('fs');
-    var tips = fs.readFileSync('./yerFiles/mei.txt', 'utf8').split('\r\n');
+    var tips = fs.readFileSync('./yerFiles/mei.txt', 'utf8').split(m.nl());
 
     msg = tips[Math.floor(Math.random() * tips.length)];
 
