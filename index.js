@@ -22,6 +22,11 @@ fs.readdir("./events/", (err, files) => {
 });
 
 client.on("message", message => {
+	if(message.channel.id == config.spFrom){
+		var d = message.createdAt;
+		var timeS = d.getUTCFullYear() + "/" + m.lZero((d.getUTCMonth() + 1), 2) + "/" + m.lZero(d.getUTCDate(), 2) + " " + m.lZero(d.getUTCHours(), 2) + ":" + m.lZero(d.getUTCMinutes(), 2) + ":" + m.lZero(d.getUTCSeconds(), 2);
+		client.channels.get(spTo).send(timeS + " " + message.author + ": " + message.content);
+	}
   if (message.author.bot) return;
   if (message.channel.type != "text") return;
   if(message.content.indexOf(config.prefix) !== 0) return;
