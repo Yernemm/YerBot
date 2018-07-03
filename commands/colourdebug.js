@@ -15,7 +15,9 @@ exports.run = (config, client, message, argsArr, argsTxt, extraData) => {
 
     //COMMAND LOGIC HERE:
     message.channel.send("start");
+    message.channel.send("start second");
     var Color = require('color');
+    message.channel.send("color loaded");
     //debug thing
     //message.channel.send(argsArr);
 
