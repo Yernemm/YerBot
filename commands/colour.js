@@ -39,6 +39,7 @@ exports.run = (config, client, message, argsArr, argsTxt, extraData) => {
             }
             break;
         case "role":
+        //Used this fancy find notation instead of the standard one to make it case insensitive.
             var role = message.guild.roles.find(val => val.name.toLowerCase() === argsTxt.slice(argsArr[0].length + 1).toLowerCase());
             if(role!=null){
 
