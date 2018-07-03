@@ -1,6 +1,6 @@
 //METADATA
-const desc = "Shows the colour given by the code.\r\nModes and code examples:\r\ncolour hex ff0000\r\ncolour rgb 255 0 0"; //Short description of what the command does.
-const usage = "<mode> <code>"; //Any parameters required for command.
+const desc = "Shows the colour given by the code.\r\nModes and code examples:\r\ncolour hex ff0000\r\ncolour rgb 255 0 0\r\n\r\nAlso works with roles, for example:\r\ncolour role admin"; //Short description of what the command does.
+const usage = "<mode> <code> OR role <role name>"; //Any parameters required for command.
 const cmdtype = "utility"; //Type of command
 //Command
 exports.run = (config, client, message, argsArr, argsTxt, extraData) => {
@@ -37,8 +37,21 @@ exports.run = (config, client, message, argsArr, argsTxt, extraData) => {
                 msg = "Invalid rgb colour."
                 message.channel.send(msg);
             }
-
             break;
+        case "role":
+            var role = message.guild.roles.find(val => val.name.toLowerCase() === argsTxt.slice(argsArr[0].length + 1).toLowerCase());
+            if(role!=null){
+
+               var col =  Color('#' + m.lZero(role.color.toString(16), 6));
+               sendRGBCol(col, config, client, message, argsArr, argsTxt, extraData);
+               
+            }else{
+                msg = "Role '" + argsTxt.slice(argsArr[0].length + 1) + "' not found."
+                message.channel.send(msg);
+            }
+        break;
+
+            
         default:
             msg = "Invalid mode."
             message.channel.send(msg);
