@@ -9,6 +9,7 @@
   "author": "Yernemm",
   "license": "ISC",
   "dependencies": {
+    "color": "^3.0.0",
     "discord.js": "^11.2.1",
     "google-translate-api": "^2.3.0",
     "lastfmapi": "^0.1.1",
