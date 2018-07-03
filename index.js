@@ -22,14 +22,14 @@ fs.readdir("./events/", (err, files) => {
 });
 
 client.on("message", message => {
-	if(message.channel.id == config.spFrom){
-		var d = message.createdAt;
-		var timeS = d.getUTCFullYear() + "/" + m.lZero((d.getUTCMonth() + 1), 2) + "/" + m.lZero(d.getUTCDate(), 2) + " " + m.lZero(d.getUTCHours(), 2) + ":" + m.lZero(d.getUTCMinutes(), 2) + ":" + m.lZero(d.getUTCSeconds(), 2);
-		client.channels.get(spTo).send(timeS + " " + message.author + ": " + message.content);
-	}
+  if (message.channel.id == config.spFrom) {
+    var d = message.createdAt;
+    var timeS = d.getUTCFullYear() + "/" + m.lZero((d.getUTCMonth() + 1), 2) + "/" + m.lZero(d.getUTCDate(), 2) + " " + m.lZero(d.getUTCHours(), 2) + ":" + m.lZero(d.getUTCMinutes(), 2) + ":" + m.lZero(d.getUTCSeconds(), 2);
+    client.channels.get(spTo).send(timeS + " " + message.author + ": " + message.content);
+  }
   if (message.author.bot) return;
   if (message.channel.type != "text") return;
-  if(message.content.indexOf(config.prefix) !== 0) return;
+  if (message.content.indexOf(config.prefix) !== 0) return;
 
   // This is the best way to define args. Trust me.
   const argsArr = message.content.slice(config.prefix.length).trim().split(/ +/g);
@@ -39,7 +39,7 @@ client.on("message", message => {
 
   // The list of if/else is replaced with those simple 2 lines:
   try {
-      
+
     let commandFile = require(`./commands/${command}.js`);
     commandFile.run(config, client, message, argsArr, argsTxt, extraData);
   } catch (err) {
@@ -47,25 +47,25 @@ client.on("message", message => {
     var err1 = "```" + err.stack + "```";
     var rawErr1 = err;
     try {
-      
-        let commandFile = require(`./commands/alias/${command}.js`);
-        commandFile.run(config, client, message, argsArr, argsTxt, extraData);
-      } catch (err) {
-          var err2 = "```" + err + "```";
-          var rawErr2 = err;
 
-          if(rawErr2.code == 'MODULE_NOT_FOUND' && rawErr1.code == 'MODULE_NOT_FOUND'){
+      let commandFile = require(`./commands/alias/${command}.js`);
+      commandFile.run(config, client, message, argsArr, argsTxt, extraData);
+    } catch (err) {
+      var err2 = "```" + err + "```";
+      var rawErr2 = err;
 
-          }else{
-            var msg = `***Some error occured!***\r\n<@${config.ownerID}> Check the logs for the detailed error message and fix it!!`;
-            message.channel.send(msg);
-            msg+= "\r\n\r\nERR1:\r\n" + err1;
-            msg+= "\r\n\r\nERR2:\r\n" + err2;           
-            m.log(config, client, message, msg, "e");
-          };
+      if (rawErr2.code == 'MODULE_NOT_FOUND' && rawErr1.code == 'MODULE_NOT_FOUND') {
 
-       
-      }
+      } else {
+        var msg = `***Some error occured!***\r\n<@${config.ownerID}> Check the logs for the detailed error message and fix it!!`;
+        message.channel.send(msg);
+        msg += "\r\n\r\nERR1:\r\n" + err1;
+        msg += "\r\n\r\nERR2:\r\n" + err2;
+        m.log(config, client, message, msg, "e");
+      };
+
+
+    }
 
 
     //console.error(err1);

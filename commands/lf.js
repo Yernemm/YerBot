@@ -251,28 +251,6 @@ exports.run = (config, client, message, argsArr, argsTxt, extraData) => {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
                                 case "artists":
 
 
@@ -321,25 +299,6 @@ exports.run = (config, client, message, argsArr, argsTxt, extraData) => {
                                     })
 
                                     break;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -403,12 +362,6 @@ exports.run = (config, client, message, argsArr, argsTxt, extraData) => {
 
 
                                     case "now":
-
-
-
-
-
-
 
 
 
@@ -487,45 +440,8 @@ exports.run = (config, client, message, argsArr, argsTxt, extraData) => {
 
 
 
-                                   
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
                                     break;
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
