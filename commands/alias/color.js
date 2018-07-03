@@ -1,4 +1,4 @@
-exports.run = (config, client, message, args) => {
+exports.run = (config, client, message, argsArr, argsTxt, extraData) => {
     const m = require("./../../shared/methods.js");
     //--------------------------------------------------------------------
 
@@ -14,5 +14,5 @@ exports.run = (config, client, message, args) => {
 
     //--------------------------------------------------------------------
     let commandFile = require(`./../${mainCmd}.js`);
-    commandFile.run(config, client, message, args);
+    commandFile.run(config, client, message, argsArr, argsTxt, extraData);
 }
