@@ -14,3 +14,4 @@ For setup, you need a file called "config.json" in the root directory, containin
 }
 ```
 It makes the thing do the do (∩ ͡° ͜ʖ ͡°)⊃━☆ﾟ. *
+Yes.
