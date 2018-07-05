@@ -25,6 +25,9 @@ module.exports = {
     formDateUTC: function () {
         return formDateUTC();
     },
+    capitalizeFirstLetter: function(string){
+        return capitalizeFirstLetter(string);
+    },
     getAllHeroes: function () {
         var allHeroes = ["Genji", "McCree", "Pharah", "Reaper", "Soldier: 76", "Tracer", "Bastion", "Hanzo", "Junkrat", "Mei", "Torbjorn", "Widowmaker", "D.Va",
             "Reinhardt", "Roadhog", "Winston", "Zarya", "Ana", "Lucio", "Mercy", "Symmetra", "Zenyatta", "Sombra", "Orisa", "Doomfist", "Moira", "Brigitte"
@@ -153,7 +156,9 @@ module.exports = {
 
 
 
-
+function capitalizeFirstLetter(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+}
 
 
 function logging(config, bot, message, msg, type = "d") {

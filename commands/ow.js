@@ -82,47 +82,150 @@ exports.run = (config, client, message, argsArr, argsTxt, extraData) => {
                             break;
 
                         case "stats":
-                            var options = {
-                                url: getOwApiLink(row.username, row.platform, "blob"),
-                                headers: {
-                                    'User-Agent': 'request'
-                                }
-                            };
-                            request(options, function (error, response, body) {
-                                var parsed = JSON.parse(body);
-                                if (parsed.error == 404) {
-                                    m.logSend(config, client, message, msgNotFound);
-                                } else if (parsed.error == "Private") {
-                                    m.logSend(config, client, message, msgPrivate);
-                                } else {
-                                    //console.log(body);
-                                    var userStats = parsed[row.region].stats;
+                            message.channel.send("Fetching stats. This might take a couple seconds...").then(initmsg => {
+                                var options = {
+                                    url: getOwApiLink(row.username, row.platform, "blob"),
+                                    headers: {
+                                        'User-Agent': 'request'
+                                    }
+                                };
+                                request(options, function (error, response, body) {
+                                    var parsed = JSON.parse(body);
+                                    if (parsed.error == 404) {
+                                        m.logSend(config, client, message, msgNotFound);
+                                    } else if (parsed.error == "Private") {
+                                        m.logSend(config, client, message, msgPrivate);
+                                    } else {
+                                        //console.log(body);
+
+                                        //Do stuff for console players:
 
 
-                                    var statsPage = "";
-                                    statsPage +=
-                                        `Level: **${(userStats.quickplay.overall_stats.prestige * 100) + userStats.quickplay.overall_stats.level}**\r\n`;
+                                        var userStats = parsed[row.region.toLowerCase()].stats;
+                                        var heroStats = parsed[row.region.toLowerCase()].heroes;
+                                        var mainStats;
+                                        var statsFlag = true;
+                                        if (userStats.quickplay) { mainStats = userStats.quickplay; }
+                                        else if (userStats.competitive) { mainStats = userStats.competitive; }
+                                        else {
+                                            m.logSend(config, client, message, "No stats found.");
+                                            statsFlag = false;
+                                        }
+                                        if (statsFlag) {
+                                            var statsPage = "";
+                                            statsPage +=
+                                                `Level: **${(userStats.quickplay.overall_stats.prestige * 100) + userStats.quickplay.overall_stats.level}**\r\n`;
 
-                                    var qpStats = "a";
+                                            var qpStats = "No stats found.";
+                                            if (userStats.quickplay) {
+                                                var heroes = heroStats.playtime.quickplay;
+                                                var max = -1.0000000000000000;
+                                                var max2 = -1.0000000000000000;
+                                                var max3 = -1.0000000000000000;
+                                                var hero1 = "";
+                                                var hero2 = "";
+                                                var hero3 = "";
+                                              //  heroes.forEach(h =>{
+                                              //      if(h.value > max)
+                                              //         hero1 = h;
+                                              //  });
 
-                                    var coStats = "b";
+
+                                                for (var key in heroes) {
+                                                    if (heroes.hasOwnProperty(key)) {
+                                                        console.log(key + " -> " + heroes[key]);
+                                                        if(heroes[key] > max)
+                                                        {
+                                                        max = heroes[key];
+                                                        hero3 = hero2;
+                                                        hero2 = hero1;
+                                                        hero1 = `${key} (${round2dp(heroes[key])}h)`;
+                                                        
+                                                        } else if(heroes[key] > max2)
+                                                        {
+                                                         max2 = heroes[key];
+                                                         hero3 = hero2;
+                                                        hero2 = `${key} (${round2dp(heroes[key])}h)`;
+                                                        } else if(heroes[key] > max3)
+                                                        {
+                                                         max3 = heroes[key];
+                                                        hero3 = `${key} (${round2dp(heroes[key])}h)`;
+                                                        }
+                                                    }
+                                                }
+
+                                                qpStats = "" +
+                                                    `Time played: **${round2dp(userStats.quickplay.game_stats.time_played)}h**\r\n` + 
+                                                    `Most played:\r\n**1) ${m.capitalizeFirstLetter(hero1)}**\r\n**2) ${m.capitalizeFirstLetter(hero2)}**\r\n**3) ${m.capitalizeFirstLetter(hero3)}**`
+                                            }
+
+                                            var coStats = "No stats found.";
+                                            if (userStats.competitive) {
+
+                                                var heroes = heroStats.playtime.competitive;
+                                                var max = -1.0000000000000000;
+                                                var max2 = -1.0000000000000000;
+                                                var max3 = -1.0000000000000000;
+                                                var hero1 = "";
+                                                var hero2 = "";
+                                                var hero3 = "";
+                                              //  heroes.forEach(h =>{
+                                              //      if(h.value > max)
+                                              //         hero1 = h;
+                                              //  });
+
+
+                                                for (var key in heroes) {
+                                                    if (heroes.hasOwnProperty(key)) {
+                                                        console.log(key + " -> " + heroes[key]);
+                                                        if(heroes[key] > max)
+                                                        {
+                                                        max = heroes[key];
+                                                        hero3 = hero2;
+                                                        hero2 = hero1;
+                                                        hero1 = `${key} (${round2dp(heroes[key])}h)`;
+                                                        
+                                                        } else if(heroes[key] > max2)
+                                                        {
+                                                         max2 = heroes[key];
+                                                         hero3 = hero2;
+                                                        hero2 = `${key} (${round2dp(heroes[key])}h)`;
+                                                        } else if(heroes[key] > max3)
+                                                        {
+                                                         max3 = heroes[key];
+                                                        hero3 = `${key} (${round2dp(heroes[key])}h)`;
+                                                        }
+                                                    }
+                                                }
 
 
 
-                                    const embed = new Discord.RichEmbed()
-                                        .setTitle("Overwatch Stats for " + row.username)
-                                        .setDescription(statsPage)
-                                        .setThumbnail(userStats.quickplay.overall_stats.avatar)
-                                        .addField("Quickplay", qpStats, true)
-                                        .addField("Competitive", coStats, true)
-                                        .setColor(0xfa9c1e);
+
+                                                coStats = "" +
+                                                    `Time played: **${round2dp(userStats.competitive.game_stats.time_played)}h**\r\n`+ 
+                                                    `Most played:\r\n**1) ${m.capitalizeFirstLetter(hero1)}**\r\n**2) ${m.capitalizeFirstLetter(hero2)}**\r\n**3) ${m.capitalizeFirstLetter(hero3)}**`
+                                            }
 
 
-                                    message.channel.send({ embed });
-                                    m.log(config, client, message, statsPage);
-                                }
+
+                                            const embed = new Discord.RichEmbed()
+                                                .setTitle("Overwatch Stats for " + row.username)
+                                                .setDescription(statsPage)
+                                                .setThumbnail(userStats.quickplay.overall_stats.avatar)
+                                                .addField("Quickplay", qpStats, true)
+                                                .addField("Competitive", coStats, true)
+                                                .setColor(0xfa9c1e);
+
+
+
+
+                                            message.channel.send({ embed });
+                                            initmsg.delete();
+                                            m.log(config, client, message, statsPage);
+                                        }
+                                    }
+                                });
                             });
-
 
                             break;
 
@@ -158,8 +261,8 @@ exports.run = (config, client, message, argsArr, argsTxt, extraData) => {
                             if (validateLink() != false) {
 
                                 var user = argsTxt.slice("link ".length + argsArr[1].length + argsArr[2].length + 2);
-                                var plat = argsArr[1];
-                                var regi = argsArr[2];
+                                var plat = argsArr[1].toLowerCase();
+                                var regi = argsArr[2].toLowerCase();
 
                                 if (plat == "pc") {
                                     user = user.split('#')[0] + "-" + user.split('#')[1];
@@ -167,7 +270,7 @@ exports.run = (config, client, message, argsArr, argsTxt, extraData) => {
 
                                 sql.get(`SELECT * FROM owAcc WHERE userId ="${message.author.id}"`)
                                     .then(row => {
-                                        msg = `Account already linked to "${row.username} ${row.platform} ${row.region}". Consider unlinking with _'ow unlink'_.`
+                                        msg = `Account already linked to "${row.username} ${row.platform} ${row.region.toLowerCase()}". Consider unlinking with _'ow unlink'_.`
                                         m.logSend(config, client, message, msg);
                                     })
                                     .catch(err => {
@@ -212,18 +315,35 @@ exports.run = (config, client, message, argsArr, argsTxt, extraData) => {
 
 
     function validateLink() {
+        //platform region username
         //TO-DO: FINISH VALIDATION
         if (argsArr[1] != null && argsArr[2] != null && argsArr[3] != null) {
+            var flag = true;
             var user = argsTxt.slice(argsArr[1].length + argsArr[2].length + 2);
             var plat = argsArr[1];
             var regi = argsArr[2];
 
-
-            if (user != null && plat != null && regi != null) {
-                return true;
+            switch (plat.toLowerCase()) {
+                case "pc":
+                case "xbl":
+                case "psn":
+                    break;
+                default:
+                    flag = false;
+                    break;
             }
-            else
-                return false;
+
+            switch (regi.toLowerCase()) {
+                case "eu":
+                case "us":
+                case "kr":
+                    break;
+                default:
+                    flag = false;
+                    break;
+            }
+            return flag;
+
         } else {
             return false;
         }
@@ -251,6 +371,10 @@ exports.run = (config, client, message, argsArr, argsTxt, extraData) => {
 
 
 
+    }
+
+    function round2dp(number) {
+        return Math.round(number * 100) / 100
     }
 
 
