@@ -106,11 +106,6 @@ exports.run = (config, client, message, argsArr, argsTxt, extraData) => {
 
 
 
-                                ///
-
-
-
-
                                 switch (argsArr[0]) {
 
                                     case "link":
@@ -163,9 +158,6 @@ exports.run = (config, client, message, argsArr, argsTxt, extraData) => {
 
 
                                 }
-
-
-
 
 
 
