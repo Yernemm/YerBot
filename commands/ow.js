@@ -4,6 +4,8 @@ const usage = "help"; //Any parameters required for command.
 const cmdtype = "utility"; //Type of command
 const Discord = require("discord.js");
 //Command
+//m.logSend(config, client, message, msg); //Method will send msg to user, and also log it in both console AND log channel.
+//m.log(config, client, message, msg); //Alternative will log msg without sending msg.
 exports.run = (config, client, message, argsArr, argsTxt, extraData) => {
     const bot = client;
     const m = require("./../shared/methods.js");
@@ -19,7 +21,7 @@ exports.run = (config, client, message, argsArr, argsTxt, extraData) => {
     const sqlite = require("sqlite");
     const request = require("request");
 
-    const msgNotFound = "User not found. Re-link your account.";
+    const msgNotFound = "User not found.";
     const msgPrivate = "Profile set to private. Open Overwatch and set your career profile to public in the social settings.";
     const msgStatNotFound = "No stats found.";
 
@@ -36,6 +38,7 @@ exports.run = (config, client, message, argsArr, argsTxt, extraData) => {
                 .setTitle("Overwatch Command Help")
                 .addField("Linking", "You can link an account using `ow link <platform> <region> <username>`. For rexample, `ow link pc us Player#1234`. \nPlatforms include: `pc, xbl, psn`\nRegions include: `us, eu, kr`\n\nIf you made a mistake or you have a new account, use `ow unlink` to unlink your account and then `ow link` again to link it to the new one.", true)
                 .addField("Modes", "You can get Overwatch stats by using `ow <mode>`.\nCurrent modes are: `stats, playtime`.", true)
+                .addField("Other Players", "You can get stats for other players by appending either their discord ID or mention, or putting their own Overwatch details. For example `ow stats @MyDiscordFriend` or `ow stats pc eu MyOverwatchFriend#1234`", true)
                 .setDescription("This command will get information and stats about your overwatch account.")
                 .setThumbnail(owLogoImg)
                 .setColor(mainColour);
@@ -51,332 +54,189 @@ exports.run = (config, client, message, argsArr, argsTxt, extraData) => {
 
         default:
 
+            if (validatePlatform()) {
+                if (validateLink(0)) {
+
+                    var user = argsTxt.slice(argsArr[0].length + argsArr[1].length + argsArr[2].length + 3);
+                    var plat = argsArr[1].toLowerCase();
+                    var regi = argsArr[2].toLowerCase();
 
 
 
-            const dbp = sqlite.open("./yerFiles/db/owUsers.sqlite")
-                .then(sql => {
-
-
-
-                    //Get user info
-
-
-                    var usr = message.author.id;
-
-                    if (argsArr[1]) {
-                        usr = argsArr[1].replace("<", "").replace("@", "").replace("!", "").replace(">", "");
+                    if (plat == "pc" && user.includes("#")) {
+                        user = user.split('#')[0] + "-" + user.split('#')[1];
                     }
 
-                    sql.get(`SELECT * FROM owAcc WHERE userId ="${usr}"`)
-                        .then(row => {
+                    console.log(user);
+                    console.log(plat);
+                    console.log(regi);
 
+                    switch (argsArr[0]) {
+                        case "stats":
+                            statsCmd(plat, regi, user);
+                            break;
+                        case "playtime":
+                            playtimeCmd(plat, regi, user);
+                            break;
+                    }
+                } else {
+                    m.logSend(config, client, message, "Invalid user details.");
+                }
 
+            } else {
 
 
-                            ///
+                const dbp = sqlite.open("./yerFiles/db/owUsers.sqlite")
+                    .then(sql => {
 
 
 
+                        //Get user info
 
-                            switch (argsArr[0]) {
 
-                                case "link":
+                        var usr = message.author.id;
 
+                        if (argsArr[1]) {
+                            usr = argsArr[1].replace("<", "").replace("@", "").replace("!", "").replace(">", "");
+                        }
 
-                                    m.logSend(config, client, message, `Account already linked to "${row.username} ${row.platform} ${row.region}". Consider unlinking with _'ow unlink'_.`);
+                        sql.get(`SELECT * FROM owAcc WHERE userId ="${usr}"`)
+                            .then(row => {
 
 
 
 
-                                    break;
+                                ///
 
-                                case "unlink":
 
-                                    sql.get(`SELECT * FROM owAcc WHERE userId ="${message.author.id}"`)
-                                        .then(row => {
 
 
-                                            let username = row.username;
-                                            sql.run(`DELETE FROM owAcc WHERE userId ="${message.author.id}"`)
-                                                .then(() => {
-                                                    m.logSend(config, client, message, `Overwatch user "${username}" has been unlinked.`);
-                                                })
-                                                .catch(err => {
-                                                    m.logSend(config, client, message, `Error unlinking "${username}".`);
-                                                });
-                                        });
+                                switch (argsArr[0]) {
 
+                                    case "link":
 
 
+                                        m.logSend(config, client, message, `Account already linked to "${row.username} ${row.platform} ${row.region}". Consider unlinking with _'ow unlink'_.`);
 
-                                    break;
 
-                                case "stats":
-                                    message.channel.send(fetchMsg).then(initmsg => {
-                                        var options = {
-                                            url: getOwApiLink(row.username, row.platform, "blob"),
-                                            headers: {
-                                                'User-Agent': 'request'
-                                            }
-                                        };
-                                        request(options, function (error, response, body) {
-                                            var parsed = JSON.parse(body);
-                                            if (parsed.error == 404) {
-                                                m.logSend(config, client, message, msgNotFound);
-                                            } else if (parsed.error == "Private") {
-                                                m.logSend(config, client, message, msgPrivate);
-                                            } else {
-                                                //console.log(body);
 
-                                                //Do stuff for console players:
 
-                                                if (parsed[row.region.toLowerCase()] == null) {
-                                                    m.logSend(config, client, message, "No data found for region " + row.region.toLowerCase());
-                                                } else {
-                                                    var userStats = parsed[row.region.toLowerCase()].stats;
-                                                    var heroStats = parsed[row.region.toLowerCase()].heroes;
+                                        break;
 
-                                                    var statsFlag = true;
-                                                    if (userStats.quickplay) { mainStats = userStats.quickplay; }
-                                                    else if (userStats.competitive) { mainStats = userStats.competitive; }
-                                                    else {
-                                                        m.logSend(config, client, message, msgStatNotFound);
-                                                        statsFlag = false;
-                                                    }
-                                                    if (statsFlag) {
-                                                        var statsPage = "";
-                                                        statsPage +=
-                                                            `Level: **${(userStats.quickplay.overall_stats.prestige * 100) + userStats.quickplay.overall_stats.level}**\r\n`;
-
-                                                        var qpStats = msgStatNotFound;
-
-                                                        //Sort heroes.
-                                                        if (userStats.quickplay) {
-                                                            var heroes = heroStats.playtime.quickplay;
-
-
-                                                            var heroS = sHeroes(heroes);
-
-
-                                                            qpStats = "" +
-                                                                `Time played: **${round2dp(userStats.quickplay.game_stats.time_played)}h**\r\n` +
-                                                                `Most played:\r\n${heroS[0]}\r\n${heroS[1]}\r\n${heroS[2]}`
-                                                        }
-
-                                                        var corank = "Unranked"
-                                                        var coStats = msgStatNotFound;
-                                                        if (userStats.competitive) {
-
-
-
-                                                            var heroes = heroStats.playtime.competitive;
-
-                                                            var heroS = sHeroes(heroes);
-
-
-                                                            coStats = "" +
-                                                                `Time played: **${round2dp(userStats.competitive.game_stats.time_played)}h**\r\n` +
-                                                                `Most played:\r\n${heroS[0]}\r\n${heroS[1]}\r\n${heroS[2]}`;
-
-                                                            if (userStats.competitive.overall_stats.comprank != null) {
-                                                                corank = m.capitalizeFirstLetter(userStats.competitive.overall_stats.tier) + ` (${userStats.competitive.overall_stats.comprank} SR)`;
-                                                            }
-                                                        }
-
-
-                                                        statsPage += `Competitive rank: **${corank}**`;
-
-
-                                                        const embed = new Discord.RichEmbed()
-                                                            .setTitle("Overwatch Stats for " + row.username)
-                                                            .setDescription(statsPage)
-                                                            .setThumbnail(userStats.quickplay.overall_stats.avatar)
-                                                            .addField("Quickplay", qpStats, true)
-                                                            .addField("Competitive", coStats, true)
-                                                            .setColor(mainColour);
-
-
-
-
-                                                        message.channel.send({ embed });
-                                                        initmsg.delete();
-                                                        m.log(config, client, message, statsPage);
-                                                    }
-                                                }
-                                            }
-                                        });
-                                    });
-
-                                    break;
-
-                                case "playtime":
-
-                                    message.channel.send(fetchMsg).then(initmsg => {
-                                        var options = {
-                                            url: getOwApiLink(row.username, row.platform, "blob"),
-                                            headers: {
-                                                'User-Agent': 'request'
-                                            }
-                                        };
-                                        request(options, function (error, response, body) {
-                                            var parsed = JSON.parse(body);
-                                            if (parsed.error == 404) {
-                                                m.logSend(config, client, message, msgNotFound);
-                                            } else if (parsed.error == "Private") {
-                                                m.logSend(config, client, message, msgPrivate);
-                                            } else {
-                                                //console.log(body);
-
-                                                //Do stuff for console players:
-
-                                                if (parsed[row.region.toLowerCase()] == null) {
-                                                    m.logSend(config, client, message, "No data found for region " + row.region.toLowerCase());
-                                                } else {
-
-                                                    var heroStats = parsed[row.region.toLowerCase()].heroes;
-                                                    var userStats = parsed[row.region.toLowerCase()].stats;
-
-
-
-
-
-                                                    //Sort heroes.
-                                                    var qpStats = msgStatNotFound;
-
-                                                    if (userStats.quickplay) {
-                                                        var heroes = heroStats.playtime.quickplay;
-
-
-                                                        var heroS = sHeroes(heroes);
-                                                        qpStats = "";
-                                                        heroS.forEach(h => {
-                                                            qpStats += h + "\r\n";
-                                                        });
-                                                    }
-
-
-
-
-                                                    var coStats = msgStatNotFound;
-                                                    if (userStats.competitive) {
-
-
-                                                        var heroes = heroStats.playtime.competitive;
-
-                                                        var heroS = sHeroes(heroes);
-
-                                                        coStats = "";
-                                                        heroS.forEach(h => {
-                                                            coStats += h + "\r\n";
-                                                        });
-                                                    }
-
-
-
-                                                    const embed = new Discord.RichEmbed()
-                                                        .setTitle("Overwatch Stats for " + row.username)
-                                                        .setDescription("Play time stats for all heroes:")
-                                                        .setThumbnail(userStats.quickplay.overall_stats.avatar)
-                                                        .addField("Quickplay", qpStats, true)
-                                                        .addField("Competitive", coStats, true)
-                                                        .setColor(mainColour);
-
-
-
-
-                                                    message.channel.send({ embed });
-                                                    initmsg.delete();
-                                                    m.log(config, client, message, "Play time stats for all heroes");
-
-                                                }
-                                            }
-                                        });
-                                    });
-
-
-
-                                    break;
-
-                                default:
-
-                                    break;
-
-
-                            }
-
-
-
-
-
-
-                        })
-                        .catch(err => {
-                            if (argsArr[0] != "help" && argsArr[0] != "link" && argsArr[0] != "unlink") {
-                                let errmsg = "Linked account not found. Consider using _'ow link'_."
-                                message.channel.send(errmsg);
-                                m.log(config, client, message, errmsg + "\r\n\r\n" + err);
-                            }
-
-                            switch (argsArr[0]) {
-
-
-                                case "link":
-
-                                    //platform region username
-
-                                    if (validateLink() != false) {
-
-                                        var user = argsTxt.slice("link ".length + argsArr[1].length + argsArr[2].length + 2);
-                                        var plat = argsArr[1].toLowerCase();
-                                        var regi = argsArr[2].toLowerCase();
-
-                                        if (plat == "pc" && plat.includes("#")) {
-                                            user = user.split('#')[0] + "-" + user.split('#')[1];
-                                        }
+                                    case "unlink":
 
                                         sql.get(`SELECT * FROM owAcc WHERE userId ="${message.author.id}"`)
                                             .then(row => {
-                                                msg = `Account already linked to "${row.username} ${row.platform} ${row.region.toLowerCase()}". Consider unlinking with _'ow unlink'_.`
-                                                m.logSend(config, client, message, msg);
-                                            })
-                                            .catch(err => {
-                                                m.log(config, client, message, err + " -1 ");
-                                                sql.run(`CREATE TABLE IF NOT EXISTS owAcc (userId TEXT, username TEXT, platform TEXT, region TEXT)`)
+
+
+                                                let username = row.username;
+                                                sql.run(`DELETE FROM owAcc WHERE userId ="${message.author.id}"`)
                                                     .then(() => {
-                                                        sql.run(`INSERT INTO owAcc (userId, username, platform, region) VALUES (?, ?, ?, ?)`, [message.author.id, user, plat, regi])
-                                                            .then(() => {
-                                                                m.logSend(config, client, message, `Discord account linked to: \r\n    Username: "${user}"\r\n    Platform: "${plat}"\r\n    Region: "${regi}"`);
-                                                            })
-                                                            .catch(err => {
-                                                                //Failed to add account.
-                                                                m.log(config, client, message, err + " -2 ");
-                                                            });
+                                                        m.logSend(config, client, message, `Overwatch user "${username}" has been unlinked.`);
                                                     })
                                                     .catch(err => {
-                                                        //Failed to create table.
-                                                        m.log(config, client, message, err + " -3 ");
-
+                                                        m.logSend(config, client, message, `Error unlinking "${username}".`);
                                                     });
                                             });
 
 
 
-                                    } else {
-                                        m.logSend(config, client, message, "Invalid linking parameters.");
-                                    }
+
+                                        break;
+
+                                    case "stats":
+                                        statsCmd(row.platform, row.region, row.username);
+
+                                        break;
+
+                                    case "playtime":
+
+                                        playtimeCmd(row.platform, row.region, row.username);
 
 
-                                    break;
-                            }
 
-                        });
+                                        break;
+
+                                    default:
+
+                                        break;
+
+
+                                }
 
 
 
-                });
 
+
+
+                            })
+                            .catch(err => {
+                                if (argsArr[0] != "help" && argsArr[0] != "link" && argsArr[0] != "unlink") {
+                                    let errmsg = "Linked account not found. Consider using _'ow link'_."
+                                    message.channel.send(errmsg);
+                                    m.log(config, client, message, errmsg + "\r\n\r\n" + err);
+                                }
+
+                                switch (argsArr[0]) {
+
+
+                                    case "link":
+
+                                        //platform region username
+
+                                        if (validateLink() != false) {
+
+                                            var user = argsTxt.slice("link ".length + argsArr[1].length + argsArr[2].length + 2);
+                                            var plat = argsArr[1].toLowerCase();
+                                            var regi = argsArr[2].toLowerCase();
+
+                                            if (plat == "pc" && user.includes("#")) {
+                                                user = user.split('#')[0] + "-" + user.split('#')[1];
+                                            }
+
+                                            sql.get(`SELECT * FROM owAcc WHERE userId ="${message.author.id}"`)
+                                                .then(row => {
+                                                    msg = `Account already linked to "${row.username} ${row.platform} ${row.region.toLowerCase()}". Consider unlinking with _'ow unlink'_.`
+                                                    m.logSend(config, client, message, msg);
+                                                })
+                                                .catch(err => {
+                                                    m.log(config, client, message, err + " -1 ");
+                                                    sql.run(`CREATE TABLE IF NOT EXISTS owAcc (userId TEXT, username TEXT, platform TEXT, region TEXT)`)
+                                                        .then(() => {
+                                                            sql.run(`INSERT INTO owAcc (userId, username, platform, region) VALUES (?, ?, ?, ?)`, [message.author.id, user, plat, regi])
+                                                                .then(() => {
+                                                                    m.logSend(config, client, message, `Discord account linked to: \r\n    Username: "${user}"\r\n    Platform: "${plat}"\r\n    Region: "${regi}"`);
+                                                                })
+                                                                .catch(err => {
+                                                                    //Failed to add account.
+                                                                    m.log(config, client, message, err + " -2 ");
+                                                                });
+                                                        })
+                                                        .catch(err => {
+                                                            //Failed to create table.
+                                                            m.log(config, client, message, err + " -3 ");
+
+                                                        });
+                                                });
+
+
+
+                                        } else {
+                                            m.logSend(config, client, message, "Invalid linking parameters.");
+                                        }
+
+
+                                        break;
+                                }
+
+                            });
+
+
+
+                    });
+            }
             break;
+
 
     }
 
@@ -385,14 +245,14 @@ exports.run = (config, client, message, argsArr, argsTxt, extraData) => {
     //m.log(config, client, message, msg); //Alternative will log msg without sending msg.
 
 
-    function validateLink() {
+    function validateLink(offset = 0) {
         //platform region username
         //TO-DO: FINISH VALIDATION
-        if (argsArr[1] != null && argsArr[2] != null && argsArr[3] != null) {
+        if (argsArr[1 + offset] != null && argsArr[2 + offset] != null && argsArr[3 + offset] != null) {
             var flag = true;
-            var user = argsTxt.slice(argsArr[1].length + argsArr[2].length + 2);
-            var plat = argsArr[1];
-            var regi = argsArr[2];
+            var user = argsTxt.slice(argsArr[1 + offset].length + argsArr[2 + offset].length + 2);
+            var plat = argsArr[1 + offset];
+            var regi = argsArr[2 + offset];
 
             switch (plat.toLowerCase()) {
                 case "pc":
@@ -418,6 +278,23 @@ exports.run = (config, client, message, argsArr, argsTxt, extraData) => {
         } else {
             return false;
         }
+    }
+
+    function validatePlatform(offset = 0) {
+        var flag = true;
+        var plat = argsArr[1 + offset];
+        if (plat) {
+            switch (plat.toLowerCase()) {
+                case "pc":
+                case "xbl":
+                case "psn":
+                    break;
+                default:
+                    flag = false;
+                    break;
+            }
+            return flag;
+        } else return false;
     }
 
 
@@ -459,6 +336,194 @@ exports.run = (config, client, message, argsArr, argsTxt, extraData) => {
 
     }
 
+    function statsCmd(platform, region, username) {
+
+        message.channel.send(fetchMsg).then(initmsg => {
+            var options = {
+                url: getOwApiLink(username, platform, "blob"),
+                headers: {
+                    'User-Agent': 'request'
+                }
+            };
+            request(options, function (error, response, body) {
+                var parsed = JSON.parse(body);
+                if (parsed.error == 404) {
+                    m.logSend(config, client, message, msgNotFound);
+                } else if (parsed.error == "Private") {
+                    m.logSend(config, client, message, msgPrivate);
+                } else {
+                    //console.log(body);
+
+                    //Do stuff for console players:
+
+                    if (parsed[region.toLowerCase()] == null) {
+                        m.logSend(config, client, message, "No data found for region " + region.toLowerCase());
+                    } else {
+                        var userStats = parsed[region.toLowerCase()].stats;
+                        var heroStats = parsed[region.toLowerCase()].heroes;
+
+                        var statsFlag = true;
+                        if (userStats.quickplay) { mainStats = userStats.quickplay; }
+                        else if (userStats.competitive) { mainStats = userStats.competitive; }
+                        else {
+                            m.logSend(config, client, message, msgStatNotFound);
+                            statsFlag = false;
+                        }
+                        if (statsFlag) {
+                            var statsPage = "";
+                            statsPage +=
+                                `Level: **${(userStats.quickplay.overall_stats.prestige * 100) + userStats.quickplay.overall_stats.level}**\r\n`;
+
+                            var qpStats = msgStatNotFound;
+
+                            //Sort heroes.
+                            if (userStats.quickplay) {
+                                var heroes = heroStats.playtime.quickplay;
+
+
+                                var heroS = sHeroes(heroes);
+
+
+                                qpStats = "" +
+                                    `Time played: **${round2dp(userStats.quickplay.game_stats.time_played)}h**\r\n` +
+                                    `Most played:\r\n${heroS[0]}\r\n${heroS[1]}\r\n${heroS[2]}`
+                            }
+
+                            var corank = "Unranked"
+                            var coStats = msgStatNotFound;
+                            if (userStats.competitive) {
+
+
+
+                                var heroes = heroStats.playtime.competitive;
+
+                                var heroS = sHeroes(heroes);
+
+
+                                coStats = "" +
+                                    `Time played: **${round2dp(userStats.competitive.game_stats.time_played)}h**\r\n` +
+                                    `Most played:\r\n${heroS[0]}\r\n${heroS[1]}\r\n${heroS[2]}`;
+
+                                if (userStats.competitive.overall_stats.comprank != null) {
+                                    corank = m.capitalizeFirstLetter(userStats.competitive.overall_stats.tier) + ` (${userStats.competitive.overall_stats.comprank} SR)`;
+                                }
+                            }
+
+
+                            statsPage += `Competitive rank: **${corank}**`;
+
+
+                            const embed = new Discord.RichEmbed()
+                                .setTitle("Overwatch Stats for " + username)
+                                .setDescription(statsPage)
+                                .setThumbnail(userStats.quickplay.overall_stats.avatar)
+                                .addField("Quickplay", qpStats, true)
+                                .addField("Competitive", coStats, true)
+                                .setColor(mainColour);
+
+
+
+
+                            message.channel.send({ embed });
+                            initmsg.delete();
+                            m.log(config, client, message, statsPage);
+                        }
+                    }
+                }
+            });
+        });
+
+
+
+    }
+
+
+    function playtimeCmd(platform, region, username) {
+        message.channel.send(fetchMsg).then(initmsg => {
+            var options = {
+                url: getOwApiLink(username, platform, "blob"),
+                headers: {
+                    'User-Agent': 'request'
+                }
+            };
+            request(options, function (error, response, body) {
+                var parsed = JSON.parse(body);
+                if (parsed.error == 404) {
+                    m.logSend(config, client, message, msgNotFound);
+                } else if (parsed.error == "Private") {
+                    m.logSend(config, client, message, msgPrivate);
+                } else {
+                    //console.log(body);
+
+                    //Do stuff for console players:
+
+                    if (parsed[region.toLowerCase()] == null) {
+                        m.logSend(config, client, message, "No data found for region " + region.toLowerCase());
+                    } else {
+
+                        var heroStats = parsed[region.toLowerCase()].heroes;
+                        var userStats = parsed[region.toLowerCase()].stats;
+
+
+
+
+
+                        //Sort heroes.
+                        var qpStats = msgStatNotFound;
+
+                        if (userStats.quickplay) {
+                            var heroes = heroStats.playtime.quickplay;
+
+
+                            var heroS = sHeroes(heroes);
+                            qpStats = "";
+                            heroS.forEach(h => {
+                                qpStats += h + "\r\n";
+                            });
+                        }
+
+
+
+
+                        var coStats = msgStatNotFound;
+                        if (userStats.competitive) {
+
+
+                            var heroes = heroStats.playtime.competitive;
+
+                            var heroS = sHeroes(heroes);
+
+                            coStats = "";
+                            heroS.forEach(h => {
+                                coStats += h + "\r\n";
+                            });
+                        }
+
+
+
+                        const embed = new Discord.RichEmbed()
+                            .setTitle("Overwatch Stats for " + username)
+                            .setDescription("Play time stats for all heroes:")
+                            .setThumbnail(userStats.quickplay.overall_stats.avatar)
+                            .addField("Quickplay", qpStats, true)
+                            .addField("Competitive", coStats, true)
+                            .setColor(mainColour);
+
+
+
+
+                        message.channel.send({ embed });
+                        initmsg.delete();
+                        m.log(config, client, message, "Play time stats for all heroes");
+
+                    }
+                }
+            });
+        });
+
+
+
+    }
 
 
 
