@@ -54,7 +54,7 @@ exports.run = (config, client, message, argsArr, argsTxt, extraData) => {
 
         default:
 
-            if (validatePlatform()) {
+            if (validatePlatform() && argsArr[0] != "link") {
                 if (validateLink(0)) {
 
                     var user = argsTxt.slice(argsArr[0].length + argsArr[1].length + argsArr[2].length + 3);
