@@ -21,6 +21,13 @@ fs.readdir("./events/", (err, files) => {
   });
 });
 
+client.on("guildMemberAdd", (member) => {
+  //When new user joins
+  m.logNoMsg(config, client, `New user "${member.user.username}#${member.user.discriminator}" with ID \`${member.id}\` [ <@${member.id}> ] joining ${member.guild.name} with guild ID \`${member.guild.id}\``);
+
+
+});
+
 client.on("message", message => {
   if (message.channel.id == config.spFrom) {
     var d = message.createdAt;
