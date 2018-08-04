@@ -25,6 +25,15 @@ client.on("guildMemberAdd", (member) => {
   //When new user joins
   m.logNoMsg(config, client, `New user "${member.user.username}#${member.user.discriminator}" with ID \`${member.id}\` [ <@${member.id}> ] joining ${member.guild.name} with guild ID \`${member.guild.id}\``);
 
+  //Auto ban
+  if (member.user.username.includes("discord.gg/")) {
+    switch (member.guild.id) {
+      case "416427452085305374": //Brig mains
+        m.logNoMsg(config, client, `**User auto-banned** "${member.user.username}#${member.user.discriminator}" with ID \`${member.id}\` [ <@${member.id}> ] in ${member.guild.name} with guild ID \`${member.guild.id}\``);
+        member.ban("Auto-ban by YerBot: detected invite link in username.");
+        break;
+    }
+  }
 
 });
 
