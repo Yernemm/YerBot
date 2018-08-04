@@ -29,6 +29,8 @@ client.on("guildMemberAdd", (member) => {
   if (member.user.username.includes("discord.gg/")) {
     switch (member.guild.id) {
       case "416427452085305374": //Brig mains
+      case "387698868239728640": //Mei mains
+      case "278476350757666817": //Zarya mains
         m.logNoMsg(config, client, `**User auto-banned** "${member.user.username}#${member.user.discriminator}" with ID \`${member.id}\` [ <@${member.id}> ] in ${member.guild.name} with guild ID \`${member.guild.id}\``);
         member.ban("Auto-ban by YerBot: detected invite link in username.");
         break;
