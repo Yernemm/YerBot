@@ -46,6 +46,31 @@ client.on("message", message => {
     var timeS = d.getUTCFullYear() + "/" + m.lZero((d.getUTCMonth() + 1), 2) + "/" + m.lZero(d.getUTCDate(), 2) + " " + m.lZero(d.getUTCHours(), 2) + ":" + m.lZero(d.getUTCMinutes(), 2) + ":" + m.lZero(d.getUTCSeconds(), 2);
     client.channels.get(spTo).send(timeS + " " + message.author + ": " + message.content);
   }
+  if(message.author.bot){
+    if(message.author.username == "MEE6"){
+      //Wait 2 seconds after mee6 message sent to ensure the user has been banned already.
+      //Potential race condition between yerbot and mee6, can potentially fail sometimes.
+      util.promisify(setTimeout)(2000).then(()=>{
+        if(message.content.contains("<@") && message.content.contains(">") && message.channel.name.contains("welcome"))
+        {
+          //RegEx magic to get the ID
+          var welcomeID = /<@!?([0-9]{15,20})>/.exec(message.content)[1]
+          message.guild.fetchBans()
+          .then(bans =>{
+
+            if(bans.has(welcomeID))
+            {
+              //The user mentioned in the welcome has in fact been banned...
+              if(message.deletable())
+                message.delete();
+            }
+
+          })
+        }
+      });
+    }
+  }
+
   if (message.author.bot) return;
   if (message.channel.type != "text") return;
   if (message.content.indexOf(config.prefix) !== 0) return;
