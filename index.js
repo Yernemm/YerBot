@@ -70,9 +70,9 @@ client.on("message", message => {
                 message.delete();
             }
 
-          }).catch((err) => {});
+          }).catch((err) => {console.log("fetching bans failed"+err)});
         }
-      }).catch((err) => {});
+      }).catch((err) => {console.log("timeout failed"+err)});
     }
   }
 
