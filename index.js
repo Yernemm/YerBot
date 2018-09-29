@@ -70,9 +70,9 @@ client.on("message", message => {
                 message.delete();
             }
 
-          })
+          }).catch((err) => {});
         }
-      });
+      }).catch((err) => {});
     }
   }
 
