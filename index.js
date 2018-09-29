@@ -66,7 +66,7 @@ client.on("message", message => {
             {
               //The user mentioned in the welcome has in fact been banned...
               m.log(config, client, message, "**MESSAGE DELETED BECAUSE USER BANNED**");
-              if(message.deletable())
+              if(message.deletable)
                 message.delete();
             }
 
