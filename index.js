@@ -46,6 +46,8 @@ client.on("message", message => {
     var timeS = d.getUTCFullYear() + "/" + m.lZero((d.getUTCMonth() + 1), 2) + "/" + m.lZero(d.getUTCDate(), 2) + " " + m.lZero(d.getUTCHours(), 2) + ":" + m.lZero(d.getUTCMinutes(), 2) + ":" + m.lZero(d.getUTCSeconds(), 2);
     client.channels.get(spTo).send(timeS + " " + message.author + ": " + message.content);
   }
+
+  //Delete mee6 welcomes from banned users
   if(message.author.bot){
     if(message.author.username == "MEE6"){
       //Wait 2 seconds after mee6 message sent to ensure the user has been banned already.
@@ -61,6 +63,7 @@ client.on("message", message => {
             if(bans.has(welcomeID))
             {
               //The user mentioned in the welcome has in fact been banned...
+              m.log(config, client, message, "**MESSAGE DELETED BECAUSE USER BANNED**");
               if(message.deletable())
                 message.delete();
             }
