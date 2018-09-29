@@ -2,6 +2,7 @@ const Discord = require("discord.js");
 const client = new Discord.Client();
 const readline = require('readline');
 const fs = require("fs");
+const {promisify} = require('util');
 
 
 
@@ -52,7 +53,8 @@ client.on("message", message => {
     if(message.author.username == "MEE6"){
       //Wait 2 seconds after mee6 message sent to ensure the user has been banned already.
       //Potential race condition between yerbot and mee6, can potentially fail sometimes.
-      util.promisify(setTimeout)(2000).then(()=>{
+      const timeoutPromise = promisify(setTimeout);
+      timeoutPromise(2000).then(()=>{
         if(message.content.contains("<@") && message.content.contains(">") && message.channel.name.contains("welcome"))
         {
           //RegEx magic to get the ID
