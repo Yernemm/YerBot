@@ -61,3 +61,45 @@ sugar
 salt
 eggs
 eggplants
+a baguette
+a moth
+moth
+a map
+a hamster
+a ball
+your enemy
+your friend
+your ally
+flex tape
+cake
+uranium ore
+a volcano
+ice
+snow
+molten metal
+pineapple
+wood
+metal
+gravel
+sand
+a crate
+a lootbox
+a brick wall
+a brick
+my eyes
+my rock
+my food
+your food
+your eyes
+your face
+the mirror
+my friends
+a trap
+a cucumber
+a metal rod
+a sword
+a pickaxe
+an axe
+a house
+your house
+my house
