@@ -26,6 +26,9 @@ client.on("guildMemberAdd", (member) => {
   m.logNoMsg(config, client, `New user "${member.user.username}#${member.user.discriminator}" with ID \`${member.id}\` [ <@${member.id}> ] joining ${member.guild.name} with guild ID \`${member.guild.id}\``);
 
   //Auto ban
+  
+  //ALL-RIGHT LISTEN UP
+  //I'm lazy and the code below is awful, I'll improve it one day maybe...
   if (member.user.username.includes("discord.gg/")) {
     switch (member.guild.id) {
       //Add cases here to not auto-ban.
@@ -39,6 +42,27 @@ client.on("guildMemberAdd", (member) => {
   }
 
 });
+
+  if (member.user.username.includes("twitch.tv")) {
+    switch (member.guild.id) {
+      //Add cases here to not auto-ban.
+      default:
+      
+      member.ban("Auto-ban by YerBot: detected Twitch link in username.")
+      .then(() => m.logNoMsg(config, client, `**User auto-banned** "${member.user.username}#${member.user.discriminator}" with ID \`${member.id}\` [ <@${member.id}> ] in ${member.guild.name} with guild ID \`${member.guild.id}\``))
+      .catch(() => m.logNoMsg(config, client, `**ERROR COULD NOT BAN** "${member.user.username}#${member.user.discriminator}" with ID \`${member.id}\` [ <@${member.id}> ] in ${member.guild.name} with guild ID \`${member.guild.id}\``));
+      break;
+    }
+  }
+
+});
+
+
+
+
+
+
+
 
 client.on("message", message => {
   if (message.channel.id == config.spFrom) {
