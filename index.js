@@ -41,7 +41,7 @@ client.on("guildMemberAdd", (member) => {
     }
   }
 
-});
+
 
   if (member.user.username.includes("twitch.tv")) {
     switch (member.guild.id) {
