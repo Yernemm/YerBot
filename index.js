@@ -34,7 +34,7 @@ client.on("guildMemberAdd", (member) => {
       //Add cases here to not auto-ban.
       default:
       
-      member.ban("Auto-ban by YerBot: detected invite link in username.")
+      member.ban("[AutoBan][YerBot]: detected Discord link in username.")
       .then(() => m.logNoMsg(config, client, `**User auto-banned** "${member.user.username}#${member.user.discriminator}" with ID \`${member.id}\` [ <@${member.id}> ] in ${member.guild.name} with guild ID \`${member.guild.id}\``))
       .catch(() => m.logNoMsg(config, client, `**ERROR COULD NOT BAN** "${member.user.username}#${member.user.discriminator}" with ID \`${member.id}\` [ <@${member.id}> ] in ${member.guild.name} with guild ID \`${member.guild.id}\``));
       break;
@@ -48,7 +48,7 @@ client.on("guildMemberAdd", (member) => {
       //Add cases here to not auto-ban.
       default:
       
-      member.ban("Auto-ban by YerBot: detected Twitch link in username.")
+      member.ban("[AutoBan][YerBot]: detected Twitch link in username.")
       .then(() => m.logNoMsg(config, client, `**User auto-banned** "${member.user.username}#${member.user.discriminator}" with ID \`${member.id}\` [ <@${member.id}> ] in ${member.guild.name} with guild ID \`${member.guild.id}\``))
       .catch(() => m.logNoMsg(config, client, `**ERROR COULD NOT BAN** "${member.user.username}#${member.user.discriminator}" with ID \`${member.id}\` [ <@${member.id}> ] in ${member.guild.name} with guild ID \`${member.guild.id}\``));
       break;
