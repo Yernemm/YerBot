@@ -8,6 +8,8 @@ const fs = require("fs");
 const config = require("./config.json");
 const m = require("./shared/methods.js");
 
+const modChannel = "yerbot-mod";
+
 var logChannelID = config.logChannelID;
 
 // This loop reads the /events/ folder and attaches each event file to the appropriate event.
@@ -29,31 +31,14 @@ client.on("guildMemberAdd", (member) => {
   
   //ALL-RIGHT LISTEN UP
   //I'm lazy and the code below is awful, I'll improve it one day maybe...
-  if (member.user.username.includes("discord.gg/")) {
-    switch (member.guild.id) {
-      //Add cases here to not auto-ban.
-      default:
-      
-      member.ban("[AutoBan][YerBot]: detected Discord link in username.")
-      .then(() => m.logNoMsg(config, client, `**User auto-banned** "${member.user.username}#${member.user.discriminator}" with ID \`${member.id}\` [ <@${member.id}> ] in ${member.guild.name} with guild ID \`${member.guild.id}\``))
-      .catch(() => m.logNoMsg(config, client, `**ERROR COULD NOT BAN** "${member.user.username}#${member.user.discriminator}" with ID \`${member.id}\` [ <@${member.id}> ] in ${member.guild.name} with guild ID \`${member.guild.id}\``));
-      break;
-    }
-  }
+
+  let autoBanner = require("./autoban.js");
+  autoBanner.memberJoin(config, client, member, modChannel);
+
+  
 
 
 
-  if (member.user.username.includes("twitch.tv")) {
-    switch (member.guild.id) {
-      //Add cases here to not auto-ban.
-      default:
-      
-      member.ban("[AutoBan][YerBot]: detected Twitch link in username.")
-      .then(() => m.logNoMsg(config, client, `**User auto-banned** "${member.user.username}#${member.user.discriminator}" with ID \`${member.id}\` [ <@${member.id}> ] in ${member.guild.name} with guild ID \`${member.guild.id}\``))
-      .catch(() => m.logNoMsg(config, client, `**ERROR COULD NOT BAN** "${member.user.username}#${member.user.discriminator}" with ID \`${member.id}\` [ <@${member.id}> ] in ${member.guild.name} with guild ID \`${member.guild.id}\``));
-      break;
-    }
-  }
 
 });
 
@@ -71,14 +56,19 @@ client.on("message", message => {
     client.channels.get(spTo).send(timeS + " " + message.author + ": " + message.content);
   }
 
+
   //Delete mee6 welcomes from banned users
   if(message.author.bot){
+  
     if(message.author.username == "MEE6"){
+     
       //Wait 2 seconds after mee6 message sent to ensure the user has been banned already.
       //Potential race condition between yerbot and mee6, can potentially fail sometimes.
       const util = require('util');
       const timeoutPromise = util.promisify(setTimeout);
+    
       timeoutPromise(2000).then(()=>{
+        
         if(message.content.includes("<@") && message.content.includes(">") && message.channel.name.includes("welcome"))
         {
           //RegEx magic to get the ID
@@ -98,6 +88,11 @@ client.on("message", message => {
         }
       }).catch((err) => {console.log("timeout failed"+err)});
     }
+  }
+
+  if (message.channel.type == "dm"){
+    let autoBanner = require("./autoban.js");
+    autoBanner.dm(config, client, message, modChannel);
   }
 
   if (message.author.bot) return;
