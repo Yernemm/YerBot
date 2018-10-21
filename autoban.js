@@ -11,7 +11,8 @@ exports.init = (config, client) => {
   reasons = [
     new autoBanObject(/discord.gg\//gi, "detected Discord link in username."),
     new autoBanObject(/twitch.tv\//gi, "detected Twitch link in username."),
-    new autoBanObject(/twitter.com\//gi, "detected Twitter link in username.")
+    new autoBanObject(/twitter.com\//gi, "detected Twitter link in username."),
+    new autoBanObject(/.com\//gi, "detected link in username.")
   ];
 
 }
