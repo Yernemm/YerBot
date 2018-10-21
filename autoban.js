@@ -12,7 +12,11 @@ exports.init = (config, client) => {
     new autoBanObject(/discord.gg\//gi, "detected Discord link in username."),
     new autoBanObject(/twitch.tv\//gi, "detected Twitch link in username."),
     new autoBanObject(/twitter.com\//gi, "detected Twitter link in username."),
-    new autoBanObject(/.com\//gi, "detected link in username.")
+    new autoBanObject(/bit.ly\//gi, "detected Bitly link in username."),
+    new autoBanObject(/goo.gl\//gi, "detected Googl link in username."),
+    new autoBanObject(/.com\//gi, "detected '.com' link in username."),
+    new autoBanObject(/.org\//gi, "detected '.org' link in username."),
+    new autoBanObject(/.net\//gi, "detected '.net' link in username.")
   ];
 
 }
