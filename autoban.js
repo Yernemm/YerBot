@@ -71,20 +71,19 @@ exports.dm = (config,client,message,modChannel) =>{
 exports.memberJoin = (config, client, member, modChannel) => {
   if(member.guild.id == "503377403956035584")
   return; //Ban Appeals server.
-
+  var flag = false;
   reasons.forEach(b =>{
-
+if (flag)
+return;
     if (b.rgx.test(member.user.username)) {
+      flag = true;
       switch (member.guild.id) {
         //Add cases here to not auto-ban.
         default:
         
         if(member.bannable){
 
-
-
-
-          
+     
           var banLog = `"${member.user.username}#${member.user.discriminator}" with ID \`${member.id}\` [ <@${member.id}> ] in ${member.guild.name} with guild ID \`${member.guild.id}\` for reason: ${b.reason}`;
              
           const embed = new Discord.RichEmbed()
@@ -99,8 +98,22 @@ exports.memberJoin = (config, client, member, modChannel) => {
             m.logNoMsg(config, client, `**User auto-banned** ${banLog}`)
             
             member.user.send({embed}).then(()=>{
+              banSequence(config, client, member, modChannel, b, true);
+            })
+            .catch(()=>{
+              banSequence(config, client, member, modChannel, b, false);
+            });
 
-              member.ban("[AutoBan][YerBot]: " + b.reason)
+        }
+      
+        }
+            
+    }
+    
+  })
+}
+function banSequence(config, client, member, modChannel, b, appealSent){
+  member.ban("[AutoBan][YerBot]: " + b.reason)
               .then(() => {
       
       
@@ -126,8 +139,10 @@ exports.memberJoin = (config, client, member, modChannel) => {
                     .catch()         
                   })
                   .catch()
-      
-      
+                  
+                  let shortDesc =`Name: ${member.user.username}#${member.user.discriminator}\nID: ${member.id}\nBan Reason: ${b.reason}`;
+                  if(!appealSent)
+                  shortDesc += `\n\n**Appeal message has not been sent to the user due to their privacy settings.**`
       
                   var modCh = member.guild.channels.find(val => val.name == modChannel);
                   if(modCh != null){
@@ -137,7 +152,7 @@ exports.memberJoin = (config, client, member, modChannel) => {
                     .setThumbnail(member.user.avatarURL)
                     .setColor(0xaa2222)
                     .setTimestamp()
-                    .setDescription(`Name: ${member.user.username}#${member.user.discriminator}\nID: ${member.id}\nBan Reason: ${b.reason}`);         
+                    .setDescription(shortDesc);         
                 
                 
                     modCh.send({embed});
@@ -160,28 +175,4 @@ exports.memberJoin = (config, client, member, modChannel) => {
                 .catch(() => m.logNoMsg(config, client, `**ERROR COULD NOT BAN** ${banLog}`));
                 
     
-
-
-            });
-
-          
-
-
-
-
-
-        
-
-
-
-
-
-        }
-
-       
-        }
-        
-     
-    }
-  })
 }
