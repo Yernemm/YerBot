@@ -60,18 +60,21 @@ client.on("message", message => {
   //Delete mee6 welcomes from banned users
   if(message.author.bot){
   
-    if(message.author.username == "MEE6"){
-     
+    if(true){
+      //used to be   message.author.username == "MEE6"
       //Wait 2 seconds after mee6 message sent to ensure the user has been banned already.
       //Potential race condition between yerbot and mee6, can potentially fail sometimes.
       const util = require('util');
       const timeoutPromise = util.promisify(setTimeout);
     
-      timeoutPromise(2000).then(()=>{
+     
         
         if(message.content.includes("<@") && message.content.includes(">") && message.channel.name.includes("welcome"))
         {
-          //RegEx magic to get the ID
+          timeoutPromise(2500).then(()=>{ 
+
+
+            //RegEx magic to get the ID
           var welcomeID = /<@!?([0-9]{15,20})>/.exec(message.content)[1]
           message.guild.fetchBans()
           .then(bans =>{
@@ -85,8 +88,12 @@ client.on("message", message => {
             }
 
           }).catch((err) => {console.log("fetching bans failed"+err)});
+
+
+          }).catch((err) => {console.log("timeout failed"+err)});
+          
         }
-      }).catch((err) => {console.log("timeout failed"+err)});
+      
     }
   }
 
