@@ -14,9 +14,13 @@ exports.init = (config, client) => {
     new autoBanObject(/twitter.com\//gi, "detected Twitter link in username."),
     new autoBanObject(/bit.ly\//gi, "detected Bitly link in username."),
     new autoBanObject(/goo.gl\//gi, "detected Googl link in username."),
+    new autoBanObject(/paypal.me\//gi, "detected paypal link in username."),
+    new autoBanObject(/senseibin/gi, "spam bot owner name."),
     new autoBanObject(/.com\//gi, "detected '.com' link in username."),
+    new autoBanObject(/.me\//gi, "detected '.me' link in username."),
     new autoBanObject(/.org\//gi, "detected '.org' link in username."),
-    new autoBanObject(/.net\//gi, "detected '.net' link in username.")
+    new autoBanObject(/.net\//gi, "detected '.net' link in username."),
+    new autoBanObject(/.+\..+\/.+/gi, "detected generic link in username.")
   ];
 
 }
