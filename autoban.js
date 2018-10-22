@@ -79,12 +79,11 @@ exports.dm = (config,client,message,modChannel) =>{
 exports.memberJoin = (config, client, member, modChannel) => {
   if(member.guild.id == "503377403956035584")
   return; //Ban Appeals server.
-  var flag = false;
+  
   reasons.forEach(b =>{
-if (flag)
-return;
+
     if (b.rgx.test(member.user.username)) {
-      flag = true;
+      
       switch (member.guild.id) {
         //Add cases here to not auto-ban.
         default:
