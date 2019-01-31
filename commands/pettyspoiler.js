@@ -17,7 +17,7 @@ exports.run = (config, client, message, argsArr, argsTxt, extraData) => {
 
     var i = 1;
 
-    argsTxt.forEach(e=>{
+    argsTxt.split("").forEach(e=>{
         if(i<=398)
         msg+="||"+e+"||";
         i++;
