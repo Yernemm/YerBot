@@ -220,7 +220,7 @@ break;
     }
    // <@${config.ownerID}>
     var logChannel = bot.channels.get(config.logChannelID);
-    if(type=="e" || type=="s")
+    if(type=="e")
     logChannel.send( `<@${config.ownerID}>`, { embed });
     else
     logChannel.send({ embed });
