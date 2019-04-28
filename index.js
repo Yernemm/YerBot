@@ -147,4 +147,8 @@ client.on("message", message => {
   }
 });
 
+client.on('error', error => {
+  console.error('The WebSocket encountered an error:', error);
+});
+
 client.login(config.token);
